@@ -2,7 +2,7 @@ package com.tonsaito.ws.products.model;
 
 import java.math.BigDecimal;
 
-public class CreateProductModel {
+public class ProductModel {
 
     private String title;
     private BigDecimal price;

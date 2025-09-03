@@ -1,0 +1,1 @@
+docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server host.docker.internal:9092 --describe --topic product-created-events-topic

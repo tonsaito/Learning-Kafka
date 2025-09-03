@@ -23,10 +23,17 @@ It will contain practice projects, experiments, and progress while following the
 ## 🚀 Getting Started
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/your-repo.git
-2. Open the project in Unity Hub.
-3. Select the recommended Unity version (LTS).
-4. Explore the projects and run in the editor.
+   git clone https://github.com/tonsaito/Learning-Kafka
+2. Open the project in IntelliJ IDEA or another IDE
+3. Since this projects user Kafka inside a Docker container, to run the application locally, you must map the following ip address/DNS inside the hosts file
+``` 
+//for mac/linuxs - on terminal
+sudo sh -c 'echo "127.0.0.1 host.docker.internal" >> /etc/hosts' 
+
+//for windows - on command line
+echo 127.0.0.1 host.docker.internal >> C:\Windows\System32\drivers\etc\hosts
+```
+
 
 ## 🛠 Tech Stack
 - Apache Kafka
