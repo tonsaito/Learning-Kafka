@@ -8,13 +8,16 @@ docker compose -f docker-compose-kafka.yaml ps
 ## Kafka Commands - host machine - from command line
 ```
 // Create topic
-docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic topic1 --partitions 3 --replication-factor 3 --bootstrap-server host.docker.internal:9092
+docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic topic1 --partitions 3 --replication-factor 3 --bootstrap-server host.docker.internal:9092 --config min.insync.replicas=2
 
 // List topics
 docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-topics.sh --list --bootstrap-server host.docker.internal:9092
 
 // Describe topics
 docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-topics.sh --describe --bootstrap-server host.docker.internal:9092
+
+// Update config
+docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-configs.sh --bootstrap-server host.docker.internal:9092 --alter --entity-type topics --entity-name topic1 --add-config min.insync.replicas=2
 
 // Delete Topic
 docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kafka/bin/kafka-topics.sh --delete --topic topic1 --bootstrap-server host.docker.internal:9092

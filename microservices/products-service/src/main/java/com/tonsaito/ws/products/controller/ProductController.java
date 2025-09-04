@@ -20,7 +20,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-    private Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @PostMapping
     public ResponseEntity<ResponseModel> createProduct(@RequestBody ProductModel productModel){
