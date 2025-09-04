@@ -1,7 +1,7 @@
 package com.tonsaito.ws.products.service.impl;
 
+import com.tonsaito.lib.core.model.ProductCreatedEventModel;
 import com.tonsaito.ws.products.model.ProductModel;
-import com.tonsaito.ws.products.service.ProductCreatedEvent;
 import com.tonsaito.ws.products.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +21,9 @@ public class ProductServiceImpl implements ProductService {
     @Value("${app.kafka.topic.name}")
     private String topicName;
 
-    KafkaTemplate<String, ProductCreatedEvent> kafkaTemplate;
+    KafkaTemplate<String, ProductCreatedEventModel> kafkaTemplate;
 
-    public ProductServiceImpl(KafkaTemplate<String, ProductCreatedEvent> kafkaTemplate){
+    public ProductServiceImpl(KafkaTemplate<String, ProductCreatedEventModel> kafkaTemplate){
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -33,8 +33,8 @@ public class ProductServiceImpl implements ProductService {
         //TODO: persist Product Details in db, before publishing event
 
         //Send Event
-        ProductCreatedEvent productCreatedEvent = new ProductCreatedEvent(productId, productModel.getTitle(), productModel.getPrice(), productModel.getQuantity());
-        CompletableFuture<SendResult<String, ProductCreatedEvent>> future = kafkaTemplate.send(topicName, productId, productCreatedEvent);
+        ProductCreatedEventModel productCreatedEvent = new ProductCreatedEventModel(productId, productModel.getTitle(), productModel.getPrice(), productModel.getQuantity());
+        CompletableFuture<SendResult<String, ProductCreatedEventModel>> future = kafkaTemplate.send(topicName, productId, productCreatedEvent);
 
         future.whenComplete(((sendResult, throwable) -> {
             if(throwable != null){
@@ -54,11 +54,11 @@ public class ProductServiceImpl implements ProductService {
         //TODO: persist Product Details in db, before publishing event
 
         //Send Event
-        ProductCreatedEvent productCreatedEvent = new ProductCreatedEvent(productId, productModel.getTitle(), productModel.getPrice(), productModel.getQuantity());
+        ProductCreatedEventModel productCreatedEvent = new ProductCreatedEventModel(productId, productModel.getTitle(), productModel.getPrice(), productModel.getQuantity());
 
         LOGGER.info("****** Before publishing a ProductCreatedEvent");
 
-        SendResult<String, ProductCreatedEvent> result = kafkaTemplate.send(topicName, productId, productCreatedEvent).get();
+        SendResult<String, ProductCreatedEventModel> result = kafkaTemplate.send(topicName, productId, productCreatedEvent).get();
 
         LOGGER.info("****** Partition: "+result.getRecordMetadata().partition());
         LOGGER.info("****** Topic: "+result.getRecordMetadata().topic());

@@ -1,8 +1,8 @@
-package com.tonsaito.ws.products.service;
+package com.tonsaito.lib.core.model;
 
 import java.math.BigDecimal;
 
-public class ProductCreatedEvent {
+public class ProductCreatedEventModel {
 
     private String productId;
 
@@ -10,9 +10,9 @@ public class ProductCreatedEvent {
     private BigDecimal price;
     private Integer quantity;
 
-    public ProductCreatedEvent(){}
+    public ProductCreatedEventModel(){}
 
-    public ProductCreatedEvent(String productId, String title, BigDecimal price, Integer quantity){
+    public ProductCreatedEventModel(String productId, String title, BigDecimal price, Integer quantity){
         this.productId = productId;
         this.title = title;
         this.price = price;

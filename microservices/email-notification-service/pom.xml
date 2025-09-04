@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.tonsaito.ws</groupId>
-	<artifactId>products-service</artifactId>
+	<artifactId>email-notification-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>products-service</name>
-	<description>Products Service</description>
+	<name>email-notification-service</name>
+	<description>E-mail Notification Service with Kafka</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>

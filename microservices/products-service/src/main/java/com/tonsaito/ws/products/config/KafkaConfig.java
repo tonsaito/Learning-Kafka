@@ -1,6 +1,6 @@
 package com.tonsaito.ws.products.config;
 
-import com.tonsaito.ws.products.service.ProductCreatedEvent;
+import com.tonsaito.lib.core.model.ProductCreatedEventModel;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,12 +66,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    KafkaTemplate<String, ProductCreatedEvent> kafkaTemplate(){
-        return new KafkaTemplate<String, ProductCreatedEvent>(producerFactory());
+    KafkaTemplate<String, ProductCreatedEventModel> kafkaTemplate(){
+        return new KafkaTemplate<String, ProductCreatedEventModel>(producerFactory());
     }
 
     @Bean
-    ProducerFactory<String, ProductCreatedEvent> producerFactory(){
+    ProducerFactory<String, ProductCreatedEventModel> producerFactory(){
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
