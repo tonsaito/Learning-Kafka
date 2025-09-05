@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @KafkaListener(topics="product-created-events-topic")
-public class ProductCreatedEvenetHandler {
+public class ProductCreatedEventHandler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
