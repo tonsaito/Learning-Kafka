@@ -16,11 +16,11 @@ public class ErrorEventHandler {
     @KafkaHandler
     public void handle(ErrorHandlerModel errorHandlerModel){
         StringBuilder sb = new StringBuilder();
-        sb.append("\n>>>> New error received ============ ").append(errorHandlerModel.getMessage());
-        sb.append("\n>>>> ON  ").append(errorHandlerModel.getTimestamp());
-        sb.append("\n>>>>  ").append(errorHandlerModel.getMessage());
-        sb.append("\n>>>> Stacktrace: ");
-        sb.append("\n>>>>  ").append(errorHandlerModel.getStacktrace());
+        sb.append("\n>>>> New error received >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ");
+        sb.append("\n> AT ").append(errorHandlerModel.getTimestamp());
+        sb.append("\n> ").append(errorHandlerModel.getMessage());
+        sb.append("\n> Stacktrace: ");
+        sb.append("\n").append(errorHandlerModel.getStacktrace());
         LOGGER.info(sb.toString());
 
     }

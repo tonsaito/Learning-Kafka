@@ -1,7 +1,10 @@
 package com.tonsaito.ws.emailnotification.config;
 
+import com.tonsaito.lib.core.model.ErrorHandlerModel;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +15,13 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,9 +54,45 @@ public class KafkaConfig {
         return  factory;
     }
 
+//    @Bean
+//    KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory){
+//        return new KafkaTemplate<>(producerFactory);
+//    }
+
     @Bean
-    KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory){
-        return new KafkaTemplate<>(producerFactory);
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> pf) {
+        KafkaTemplate<String, Object> template = new KafkaTemplate<>(pf);
+
+        template.setProducerListener(new ProducerListener<>() {
+
+            @Override
+            public void onSuccess(ProducerRecord<String, Object> record, RecordMetadata metadata) {
+                if(metadata.topic().contains("-dlt")){
+                    StringBuilder stacktrace = new StringBuilder();
+                    stacktrace.append("Service: ").append(environment.getProperty("spring.application.name"));
+                    stacktrace.append("\nTopic: ").append(metadata.topic());
+                    stacktrace.append("\nPartition:").append(record.partition());
+                    stacktrace.append("\nKey: ").append(record.key());
+                    stacktrace.append("\nValue:\n").append(new String((byte[]) record.value(), StandardCharsets.UTF_8));
+                    ErrorHandlerModel payload = new ErrorHandlerModel(
+                            new Date(),
+                            "Error during message handler. See stacktrace for more details",
+                            stacktrace.toString()
+                    );
+
+                    template.send("error-handler-events-topic", "error", payload);
+                    System.out.println(stacktrace.toString());
+                }
+            }
+
+            @Override
+            public void onError(ProducerRecord<String, Object> record, RecordMetadata metadata, Exception exception) {
+                // Intercept failed messages (including DLT)
+                System.out.println("Intercepted DLT message: " + record.value());
+            }
+        });
+
+        return template;
     }
 
     @Bean
@@ -59,8 +101,6 @@ public class KafkaConfig {
         configMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getProperty("spring.kafka.consumer.bootstrap-servers"));
         configMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-//        configMap.put(ProducerConfig., environment.getProperty("spring.kafka.consumer.error.group-id"));
-
         return new DefaultKafkaProducerFactory<>(configMap);
     }
 }
