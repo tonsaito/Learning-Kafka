@@ -1,12 +1,17 @@
 package com.tonsaito.ws.emailnotification.config;
 
+import com.google.gson.Gson;
 import com.tonsaito.lib.core.model.ErrorHandlerModel;
+import com.tonsaito.ws.emailnotification.exception.NotRetryableException;
+import com.tonsaito.ws.emailnotification.exception.RetryableException;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,17 +24,22 @@ import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Configuration
 public class KafkaConfig {
 
     @Autowired
     Environment environment;
+
+    Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Bean
     ConsumerFactory<String, Object> consumerFactory(){
@@ -46,18 +56,15 @@ public class KafkaConfig {
 
     @Bean
     ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory, KafkaTemplate<String, Object> kafkaTemplate){
-        DefaultErrorHandler defaultErrorHandler = new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate));
+        DefaultErrorHandler defaultErrorHandler = new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate), new FixedBackOff(5000 , 3));
+        defaultErrorHandler.addNotRetryableExceptions(NotRetryableException.class);
+        defaultErrorHandler.addNotRetryableExceptions(RetryableException.class);
 
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setCommonErrorHandler(defaultErrorHandler);
         return  factory;
     }
-
-//    @Bean
-//    KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory){
-//        return new KafkaTemplate<>(producerFactory);
-//    }
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> pf) {
@@ -69,19 +76,29 @@ public class KafkaConfig {
             public void onSuccess(ProducerRecord<String, Object> record, RecordMetadata metadata) {
                 if(metadata.topic().contains("-dlt")){
                     StringBuilder stacktrace = new StringBuilder();
-                    stacktrace.append("Service: ").append(environment.getProperty("spring.application.name"));
-                    stacktrace.append("\nTopic: ").append(metadata.topic());
-                    stacktrace.append("\nPartition:").append(record.partition());
-                    stacktrace.append("\nKey: ").append(record.key());
-                    stacktrace.append("\nValue:\n").append(new String((byte[]) record.value(), StandardCharsets.UTF_8));
                     ErrorHandlerModel payload = new ErrorHandlerModel(
                             new Date(),
                             "Error during message handler. See stacktrace for more details",
                             stacktrace.toString()
                     );
-
-                    template.send("error-handler-events-topic", "error", payload);
-                    System.out.println(stacktrace.toString());
+                    stacktrace.append("Service: ").append(environment.getProperty("spring.application.name"));
+                    stacktrace.append("\nTopic: ").append(metadata.topic());
+                    stacktrace.append("\nPartition:").append(record.partition());
+                    stacktrace.append("\nKey: ").append(record.key());
+                    try{
+                        String tempStr = new String((byte[]) record.value(), StandardCharsets.UTF_8);
+                        stacktrace.append("\nValue:\n").append(tempStr);
+                    } catch (Exception ex){
+                        stacktrace.append("\nValue:\n").append(new Gson().toJson(record.value()));
+                        LOGGER.error(ex.getMessage());
+                    } finally {
+                        payload.setStacktrace(stacktrace.toString());
+                    }
+                    try{
+                        template.send(Objects.requireNonNull(environment.getProperty("app.kafka.topic.error.name")), "error", payload);
+                    } catch (Exception ex){
+                        LOGGER.error(ex.getMessage());
+                    }
                 }
             }
 

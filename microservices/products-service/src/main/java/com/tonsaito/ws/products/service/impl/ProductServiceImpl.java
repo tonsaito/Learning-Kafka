@@ -3,6 +3,7 @@ package com.tonsaito.ws.products.service.impl;
 import com.tonsaito.lib.core.model.ProductCreatedEventModel;
 import com.tonsaito.ws.products.model.ProductModel;
 import com.tonsaito.ws.products.service.ProductService;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +59,12 @@ public class ProductServiceImpl implements ProductService {
 
         LOGGER.info("****** Before publishing a ProductCreatedEvent");
 
-        SendResult<String, ProductCreatedEventModel> result = kafkaTemplate.send(topicName, productId, productCreatedEvent).get();
+        ProducerRecord<String, ProductCreatedEventModel> record = new ProducerRecord<>(topicName, productId, productCreatedEvent);
+        record.headers().add("messageId", UUID.randomUUID().toString().getBytes());
+        //for test idempotent consumer, use this code
+        //record.headers().add("messageId", "fixedID-for-test-purposes".getBytes());
+
+        SendResult<String, ProductCreatedEventModel> result = kafkaTemplate.send(record).get();
 
         LOGGER.info("****** Partition: "+result.getRecordMetadata().partition());
         LOGGER.info("****** Topic: "+result.getRecordMetadata().topic());
