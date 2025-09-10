@@ -18,6 +18,7 @@ It will contain practice projects, experiments, and progress while following the
 - Learn the key concepts of kafka (brokers, topics, partitions)
 - How to create and manage topics
 - Develop microservices with Java to produce and consume messages
+- Learn how to work with retries, error handling, DLT, transactions, idempotent messages and integration tests.
 - Create a real world production environment with kafka and microservices
 
 ## 🚀 Getting Started
