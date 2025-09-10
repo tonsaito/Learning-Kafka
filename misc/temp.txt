@@ -5,3 +5,18 @@ docker compose -f docker-compose-kafka.yaml exec kafka-server-1 /opt/bitnami/kaf
 
 
 {"timestamp":1757091920,"message":"Manual generated message","stacktrace":"no message"}
+
+docker compose -f docker-compose-kafka-kraft.yaml exec kafka-server-kraft-1 /usr/bin/kafka-topics --create --topic topic1 --partitions 3 --replication-factor 3 --bootstrap-server host.docker.internal:9092 --config min.insync.replicas=2
+
+/usr/bin/kafka-topics --create --topic test-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+
+# enter bash mode on container
+docker exec -it kafka-server-kraft-1 bash
+# create topic
+/usr/bin/kafka-topics --create --topic test-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+# list topics
+/usr/bin/kafka-topics --list --bootstrap-server localhost:9092
+# produce messages
+/usr/bin/kafka-console-producer --bootstrap-server localhost:9092 --topic test-topic
+# read messages
+/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test-topic --from-beginning

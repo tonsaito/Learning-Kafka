@@ -41,3 +41,16 @@ Go to inside the docker container using Docker Desktop or use the command line
 ``` ./kafka-topics.sh --create --topic topic1 --bootstrap-server host.docker.internal:9092 ```
 # List topics
 ``` ./kafka-topics.sh --list --bootstrap-server host.docker.internal:9092 ```
+
+## Kafka Commands - for kraft mode (docker-compose-kafka-kraft.yaml)
+
+# enter bash mode on container
+docker exec -it kafka-server-kraft-1 bash
+# create topic
+/usr/bin/kafka-topics --create --topic test-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+# list topics
+/usr/bin/kafka-topics --list --bootstrap-server localhost:9092
+# produce messages
+/usr/bin/kafka-console-producer --bootstrap-server localhost:9092 --topic test-topic
+# read messages
+/usr/bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic test-topic --from-beginning
