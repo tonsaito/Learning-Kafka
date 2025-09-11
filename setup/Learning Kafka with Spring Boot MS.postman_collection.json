@@ -1,0 +1,203 @@
+{
+	"info": {
+		"_postman_id": "b06115ed-e4b2-4acd-a349-e7fd3a6d19f9",
+		"name": "Learning Kafka with Spring Boot MS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26958301"
+	},
+	"item": [
+		{
+			"name": "products-service/products",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"T-Shirt\",\n    \"price\": 149.99,\n    \"quantity\": 90\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/products",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "error-handler/error-message",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"message\": \"Manual generated message 3\",\n    \"stacktrace\": \"no message\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/error-message",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"error-message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mock/response/200",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/response/200",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"response",
+						"200"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mock/response/500",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/response/500",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"response",
+						"500"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "transfer-service/transfer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"senderId\": \"Mr President\",\n    \"recepientId\": \"Me\",\n    \"amount\": 403.99\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8070/transfers",
+					"host": [
+						"localhost"
+					],
+					"port": "8070",
+					"path": [
+						"transfers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[SAGA] products-service/products",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"T-Shirt\",\n    \"price\": 149.99,\n    \"quantity\": 90\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/products",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[SAGA] orders-service/orders",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": \"9b716378-17de-4d7b-8fb4-e991b7dc8abd\",\n    \"productQuantity\": 1,\n    \"customerId\": \"0056a7c7-8838-4d9a-b467-149f06a0d123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[SAGA] orders-service/orders/{order-id}/history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/orders/ba49112e-c694-431f-b144-c578f9ed4d82/history",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"ba49112e-c694-431f-b144-c578f9ed4d82",
+						"history"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

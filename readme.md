@@ -1,6 +1,6 @@
 # Author: Ayrton Saito
 
-![Header Image](/misc/apache-kafka.jpg)
+![Header Image](/misc/project-architecture.jpg)
 
 <!-- Badges -->
 ![Apache Kafka](https://img.shields.io/badge/Messaging-Apache%20Kafka-231f20?logo=apachekafka&logoColor=white)
