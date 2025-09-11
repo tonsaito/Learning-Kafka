@@ -1,6 +1,8 @@
 package com.appsdeveloperblog.products.handler;
 
 import com.appsdeveloperblog.core.dto.Product;
+import com.appsdeveloperblog.core.dto.commands.CancelProductReservationCommand;
+import com.appsdeveloperblog.core.dto.events.ProductReservationCancelEvent;
 import com.appsdeveloperblog.core.dto.events.ProductReservationFailedEvent;
 import com.appsdeveloperblog.core.dto.events.ProductReservedEvent;
 import com.appsdeveloperblog.core.dto.commands.ReserveProductCommand;
@@ -47,9 +49,19 @@ public class ProductsCommandsHandler {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
 
-            ProductReservationFailedEvent productReservationFailedEvent = new ProductReservationFailedEvent(command.getProductId(), command.getProductId(), command.getProductQuantity());
+            ProductReservationFailedEvent event = new ProductReservationFailedEvent(command.getProductId(), command.getProductId(), command.getProductQuantity());
 
-            kafkaTemplate.send(Objects.requireNonNull(environment.getProperty("products.events.topic.name")), productReservationFailedEvent);
+            kafkaTemplate.send(Objects.requireNonNull(environment.getProperty("products.events.topic.name")), event);
         }
+    }
+
+    @KafkaHandler
+    public void handleCommand(@Payload CancelProductReservationCommand command){
+        Product productToCancel = new Product(command.getProductId(), command.getProductQuantity());
+        productService.cancelReservation(productToCancel, command.getOrderId());
+
+        ProductReservationCancelEvent event = new ProductReservationCancelEvent(command.getProductId(), command.getOrderId());
+
+        kafkaTemplate.send(Objects.requireNonNull(environment.getProperty("products.events.topic.name")), event);
     }
 }
