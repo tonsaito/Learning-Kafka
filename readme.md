@@ -34,12 +34,15 @@ sudo sh -c 'echo "127.0.0.1 host.docker.internal" >> /etc/hosts'
 //for windows - on command line
 echo 127.0.0.1 host.docker.internal >> C:\Windows\System32\drivers\etc\hosts
 ```
-
+4. To start kafka cluster, check out the commands.md file on setup folder
+5. Open and run all projects on IntelliJ or any IDE
+6. Use the postman collection to call the microservices
+7. Happy learning!
 
 ## 🛠 Tech Stack
 - Apache Kafka
 - Language: Java 17+
-- IDE: Intellij IDEA
+- IDE: IntelliJ IDEA
 
 ## ✨ Author
 Ayrton Saito
